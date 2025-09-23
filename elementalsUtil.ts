@@ -5,13 +5,9 @@ import { ROOM_MANAGER_CONTRACT_ABI } from './roomManagerAbi';
 import {IACCOUNT_ABI} from './IAccountAbi';
 
 const roomManagerContract = new ethers.Contract("0x59554b201cFc12E6930a3631060C3d9CDF704F67", ROOM_MANAGER_CONTRACT_ABI, null);
-const player1 = new Wallet(`${process.env.PLAYER1_PRIV_KEY}`)
-const player2 = new Wallet(`${process.env.PLAYER2_PRIV_KEY}`)
 
-export function buildCreateRoomData():string {
-    console.log("player1.address: ", player1.address);
-    console.log("player2.address: ", player2.address);
-    return  roomManagerContract.interface.encodeFunctionData("CreateRoom", ["0xF0bb910F0bb5bc67338a87B8e7617E432E5C1cB3", "0x2Bb9e4Fe5dE4CD2607663260D76Cd96071eE070c", player2.address,   player1.address, 3600, 3, 1231231])
+export function buildCreateRoomData(player1:string, player2:string):string {
+    return  roomManagerContract.interface.encodeFunctionData("CreateRoom", ["0xF0bb910F0bb5bc67338a87B8e7617E432E5C1cB3", "0x2Bb9e4Fe5dE4CD2607663260D76Cd96071eE070c", player1,   player2, 3600, 3, 1231231])
 }
 
 export function buildExecTransactionFromModuleReturnDataData(roomAddr:string):string {
@@ -32,3 +28,16 @@ export function buildSubmitCardsHashData(roomAddr:string):string {
     let contract = new ethers.Contract(roomAddr, ROOM_CONTRACT_ABI, null);
     return  contract.interface.encodeFunctionData("SubmitCardsHash", [cardsHash, 1])
 }
+
+export function buildSubmitCardsData(roomAddr:string):string {
+    let cards = "firewatersoil"
+    let salt = "asdasd123asdsfgfg"
+    let cardsHash = ethers.solidityPackedKeccak256(
+        ["string", "string"],
+        [cards, salt]
+    )
+    let contract = new ethers.Contract(roomAddr, ROOM_CONTRACT_ABI, null);
+    return  contract.interface.encodeFunctionData("SubmitCards", [cards, salt, 1])
+}
+
+
